@@ -35,6 +35,10 @@ import {
 import toast from "react-hot-toast";
 import { Plus } from "lucide-react";
 import EditCategoryForm from "./EditCategoryForm";
+import { useState } from "react";
+import Create from "./Create";
+import CreateCategoryForm from "./CreateCategoryForm";
+import DeleteAlert from "./DeleteAlert";
 
 interface Category {
     id: string;
@@ -64,81 +68,12 @@ export default function Index({
         router.get(url, {}, { preserveScroll: true, preserveState: false });
     };
 
-    // 🧩 Inertia form state
-    const { data, setData, post, processing, errors, reset } = useForm({
-        name: '',
-        description: '',
-    });
-
-    // 🧠 Submit handler
-    const handleSubmit = (e: React.FormEvent) => {
-        e.preventDefault();
-        console.log(data);
-        post(route('category.store'), {
-            onSuccess: () => reset(),
-        });
-    };
-
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
             <Head title="Category" />
 
             {/* Create Button */}
-            <div className="flex justify-end mb-0 mt-2" >
-                <Dialog>
-                    <DialogTrigger asChild>
-                        <Button className="mt-2 mr-2">
-                            <Plus className="w-4 h-4 mr-2" /> Category
-                        </Button>
-                    </DialogTrigger>
-
-                    <DialogContent className="sm:max-w-[500px]">
-                        <DialogHeader>
-                            <DialogTitle>Create New Category</DialogTitle>
-                            <DialogDescription>
-                                Fill the details below to create a new category.
-                            </DialogDescription>
-                        </DialogHeader>
-
-                        <form onSubmit={handleSubmit} className="space-y-4">
-                            <div>
-                                <Label htmlFor="name">Category Name</Label>
-                                <Input
-                                    id="name"
-                                    value={data.name}
-                                    onChange={(e) => setData('name', e.target.value)}
-                                    placeholder="Enter Category name"
-                                />
-                                {errors.name && (
-                                    <div className="text-red-500 text-sm">{errors.name}</div>
-                                )}
-                            </div>
-
-                            <div>
-                                <Label htmlFor="description">Description</Label>
-                                <textarea
-                                    id="description"
-                                    className="w-full border rounded-lg p-2"
-                                    value={data.description}
-                                    onChange={(e) => setData('description', e.target.value)}
-                                    placeholder="Enter Caegory description"
-                                />
-                                {errors.description && (
-                                    <div className="text-red-500 text-sm">{errors.description}</div>
-                                )}
-                            </div>
-                            <DialogFooter className="mt-4">
-                                <Button type="submit" disabled={processing}>
-                                    {processing ? 'Saving...' : 'Save Category'}
-                                </Button>
-                                <DialogClose asChild>
-                                    <Button variant="outline" className="mr-2">Cancel</Button>
-                                </DialogClose>
-                            </DialogFooter>
-                        </form>
-                    </DialogContent>
-                </Dialog>
-            </div>
+            <CreateCategoryForm />
 
             {/* Table Box */}
             <div className="rounded-xl shadow p-4 m-4 border border-sidebar-border/70 dark:border-sidebar-border">
@@ -165,58 +100,14 @@ export default function Index({
                                     <TableCell>{cat.description}</TableCell>
                                     <TableCell className="text-right space-x-2">
                                         {/* Edit Button */}
-                                        <Dialog>
-                                            <DialogTrigger asChild>
-                                                <Button size="sm" variant="outline">Edit</Button>
-                                            </DialogTrigger>
-
-                                            <DialogContent className="sm:max-w-[500px]">
-                                                <DialogHeader>
-                                                    <DialogTitle>Edit Category</DialogTitle>
-                                                    <DialogDescription>
-                                                        Update the details for {cat.name}.
-                                                    </DialogDescription>
-                                                </DialogHeader>
-
-                                                <EditCategoryForm cat={cat} />
-                                            </DialogContent>
-                                        </Dialog>
+                                        <EditCategoryForm cat={cat} />
 
                                         {/* Delete Button with AlertDialog */}
-                                        <AlertDialog>
-                                            <AlertDialogTrigger asChild>
-                                                <Button size="sm" variant="destructive">Delete</Button>
-                                            </AlertDialogTrigger>
-
-                                            <AlertDialogContent>
-                                                <AlertDialogHeader>
-                                                    <AlertDialogTitle>Are you sure?</AlertDialogTitle>
-                                                    <AlertDialogDescription>
-                                                        This action cannot be undone. The {cat.name} category will be deleted permanently.
-                                                    </AlertDialogDescription>
-                                                </AlertDialogHeader>
-
-                                                <AlertDialogFooter>
-                                                    <AlertDialogCancel>Cancel</AlertDialogCancel>
-                                                    <AlertDialogAction
-                                                        onClick={() =>
-                                                            router.delete(route("category.destroy", cat.id), {
-                                                                preserveScroll: true,
-                                                                onSuccess: () => {
-                                                                    // Optional: show success toast
-                                                                    toast.success(`${cat.name} deleted successfully!`);
-                                                                },
-                                                                onError: () => {
-                                                                    toast.error(`Failed to delete ${cat.name}`);
-                                                                }
-                                                            })
-                                                        }
-                                                    >
-                                                        Delete
-                                                    </AlertDialogAction>
-                                                </AlertDialogFooter>
-                                            </AlertDialogContent>
-                                        </AlertDialog>
+                                        <DeleteAlert
+                                            id={cat.id}
+                                            name={cat.name}
+                                            routeName="category.destroy"
+                                        />
                                     </TableCell>
 
                                 </TableRow>
