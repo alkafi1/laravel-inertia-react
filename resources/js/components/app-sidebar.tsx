@@ -26,6 +26,10 @@ const mainNavItems: NavItem[] = [
         title: 'Category',
         href: '/category',
         icon: ChartColumnStacked,
+    }, {
+        title: 'Sub Category',
+        href: '/sub-category',
+        icon: ChartColumnStacked,
     },
     {
         title: 'Products',

@@ -21,4 +21,10 @@ class CategoryService
         $categories = Category::latest()->paginate(5);
         return $categories;
     }
+
+    public function categorySelectList()
+    {
+        $categories = Category::latest();
+        return $categories;
+    }
 }
